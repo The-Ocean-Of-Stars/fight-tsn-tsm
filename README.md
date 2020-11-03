@@ -1,3 +1,3 @@
-# wrestling-tsn-tsm
-wrestling-tsn-tsm
+# fight-tsn-tsm
+fight-tsn-tsm
 
