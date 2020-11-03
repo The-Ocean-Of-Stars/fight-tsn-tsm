@@ -30,8 +30,7 @@ def main():
 
     num_class, args.train_list, args.val_list, args.root_path, prefix = dataset_config.return_dataset(args.dataset,
                                                                                                       args.modality)
-    # args.root_path = "./data/frams/"
-    # print(args.train_list, args.val_list, args.root_path)
+
 
     # exit(0)
     full_arch_name = args.arch
