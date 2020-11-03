@@ -1,0 +1,2 @@
+no_HockFight/no1_xvi 41 0
+yes_HockFight/fi1_xvi 41 1

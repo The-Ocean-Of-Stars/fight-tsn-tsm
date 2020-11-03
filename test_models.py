@@ -19,11 +19,15 @@ from torch.nn import functional as F
 
 # options
 parser = argparse.ArgumentParser(description="TSM testing on the full validation set")
-parser.add_argument('dataset', type=str)
+# parser.add_argument('dataset', type=str)
+parser.add_argument('--dataset', type=str, default="HockeyFights")
 
 # may contain splits
-parser.add_argument('--weights', type=str, default=None)
-parser.add_argument('--test_segments', type=str, default=25)
+# parser.add_argument('--weights', type=str, default=None)
+parser.add_argument('--weights', type=str,
+                    default="./pretrained/TSM_somethingv2_RGB_resnet50_shift8_blockres_avg_segment16_e45.pth")
+# parser.add_argument('--test_segments', type=str, default='25')
+parser.add_argument('--test_segments', type=str, default='8')
 parser.add_argument('--dense_sample', default=False, action="store_true", help='use dense sample as I3D')
 parser.add_argument('--twice_sample', default=False, action="store_true", help='use twice sample for ensemble')
 parser.add_argument('--full_res', default=False, action="store_true",
@@ -32,11 +36,13 @@ parser.add_argument('--full_res', default=False, action="store_true",
 parser.add_argument('--test_crops', type=int, default=1)
 parser.add_argument('--coeff', type=str, default=None)
 parser.add_argument('--batch_size', type=int, default=1)
-parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
+# parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
+parser.add_argument('-j', '--workers', default=0, type=int, metavar='N',
                     help='number of data loading workers (default: 8)')
 
 # for true test
-parser.add_argument('--test_list', type=str, default=None)
+# parser.add_argument('--test_list', type=str, default=None)
+parser.add_argument('--test_list', type=str, default=r'D:\fight-tsn-tsm\data\splits\test_videofolder.txt')
 parser.add_argument('--csv_file', type=str, default=None)
 
 parser.add_argument('--softmax', default=False, action="store_true", help='use softmax')
@@ -55,6 +61,7 @@ args = parser.parse_args()
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self):
         self.reset()
 
@@ -257,7 +264,7 @@ proc_start_time = time.time()
 max_num = args.max_num if args.max_num > 0 else total_num
 
 top1 = AverageMeter()
-top5 = AverageMeter()
+# top5 = AverageMeter()
 
 for i, data_label_pairs in enumerate(zip(*data_iter_list)):
     with torch.no_grad():
@@ -278,17 +285,21 @@ for i, data_label_pairs in enumerate(zip(*data_iter_list)):
         for p, g in zip(ensembled_predict, this_label.cpu().numpy()):
             output.append([p[None, ...], g])
         cnt_time = time.time() - proc_start_time
-        prec1, prec5 = accuracy(torch.from_numpy(ensembled_predict), this_label, topk=(1, 5))
+        # prec1, prec5 = accuracy(torch.from_numpy(ensembled_predict), this_label, topk=(1, 5))
+        prec1, = accuracy(torch.from_numpy(ensembled_predict), this_label, topk=(1,))
         top1.update(prec1.item(), this_label.numel())
-        top5.update(prec5.item(), this_label.numel())
+        # top5.update(prec5.item(), this_label.numel())
         if i % 20 == 0:
             print('video {} done, total {}/{}, average {:.3f} sec/video, '
-                  'moving Prec@1 {:.3f} Prec@5 {:.3f}'.format(i * args.batch_size, i * args.batch_size, total_num,
-                                                              float(cnt_time) / (i + 1) / args.batch_size, top1.avg,
-                                                              top5.avg))
+                  # 'moving Prec@1 {:.3f} Prec@5 {:.3f}'.format(i * args.batch_size, i * args.batch_size, total_num,
+                  'moving Prec@1 {:.3f}'.format(i * args.batch_size, i * args.batch_size, total_num,
+                                                # float(cnt_time) / (i + 1) / args.batch_size, top1.avg,
+                                                # top5.avg))
+                                                float(cnt_time) / (i + 1) / args.batch_size, top1.avg))
 
 video_pred = [np.argmax(x[0]) for x in output]
-video_pred_top5 = [np.argsort(np.mean(x[0], axis=0).reshape(-1))[::-1][:5] for x in output]
+print(output[0][0].shape)
+# video_pred_top5 = [np.argsort(np.mean(x[0], axis=0).reshape(-1))[::-1][:5] for x in output]
 
 video_labels = [x[1] for x in output]
 
@@ -305,15 +316,16 @@ if args.csv_file is not None:
         with open(args.csv_file, 'w') as f:
             for n, pred in zip(vid_names, video_pred):
                 f.write('{};{}\n'.format(n, categories[pred]))
-    else:
-        with open(args.csv_file, 'w') as f:
-            for n, pred5 in zip(vid_names, video_pred_top5):
-                fill = [n]
-                for p in list(pred5):
-                    fill.append(p)
-                f.write('{};{};{};{};{};{}\n'.format(*fill))
+    # else:
+    #     with open(args.csv_file, 'w') as f:
+    #         for n, pred5 in zip(vid_names, video_pred_top5):
+    #             fill = [n]
+    #             for p in list(pred5):
+    #                 fill.append(p)
+    #             f.write('{};{};{};{};{};{}\n'.format(*fill))
 
 cf = confusion_matrix(video_labels, video_pred).astype(float)
+# cf = confusion_matrix(video_labels, [0, 1]).astype(float)
 
 np.save('cm.npy', cf)
 cls_cnt = cf.sum(axis=1)
@@ -326,4 +338,5 @@ print('upper bound: {}'.format(upper))
 
 print('-----Evaluation is finished------')
 print('Class Accuracy {:.02f}%'.format(np.mean(cls_acc) * 100))
-print('Overall Prec@1 {:.02f}% Prec@5 {:.02f}%'.format(top1.avg, top5.avg))
+# print('Overall Prec@1 {:.02f}% Prec@5 {:.02f}%'.format(top1.avg, top5.avg))
+print('Overall Prec@1 {:.02f}%'.format(top1.avg))

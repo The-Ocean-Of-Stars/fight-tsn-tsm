@@ -9,7 +9,8 @@ ROOT_DATASET = './data/'  # '/data/jilin/'
 
 
 def return_HockeyFights(modality):
-    filename_categories = 2
+    # filename_categories = 2
+    filename_categories = 'splits/category.txt'
     if modality == 'RGB':
         root_data = ROOT_DATASET + 'frams/'
         filename_imglist_train = r'splits/train_videofolder.txt'
