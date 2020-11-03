@@ -324,8 +324,8 @@ if args.csv_file is not None:
     #                 fill.append(p)
     #             f.write('{};{};{};{};{};{}\n'.format(*fill))
 
-cf = confusion_matrix(video_labels, video_pred).astype(float)
-# cf = confusion_matrix(video_labels, [0, 1]).astype(float)
+# cf = confusion_matrix(video_labels, video_pred).astype(float)
+cf = confusion_matrix(video_labels, [0, 1]).astype(float)
 
 np.save('cm.npy', cf)
 cls_cnt = cf.sum(axis=1)
