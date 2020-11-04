@@ -25,7 +25,8 @@ parser.add_argument('--dataset', type=str, default="HockeyFights")
 # may contain splits
 # parser.add_argument('--weights', type=str, default=None)
 parser.add_argument('--weights', type=str,
-                    default="./pretrained/TSM_somethingv2_RGB_resnet50_shift8_blockres_avg_segment16_e45.pth")
+                    # default="./pretrained/TSM_somethingv2_RGB_resnet50_shift8_blockres_avg_segment16_e45.pth")
+                    default="./checkpoint/TSM_HockeyFights_RGB_resnet50_avg_segment8_e50/ckpt.best.pth.tar")
 # parser.add_argument('--test_segments', type=str, default='25')
 parser.add_argument('--test_segments', type=str, default='8')
 parser.add_argument('--dense_sample', default=False, action="store_true", help='use dense sample as I3D')
@@ -42,7 +43,7 @@ parser.add_argument('-j', '--workers', default=0, type=int, metavar='N',
 
 # for true test
 # parser.add_argument('--test_list', type=str, default=None)
-parser.add_argument('--test_list', type=str, default=r'.\data\splits\test_videofolder.txt')
+parser.add_argument('--test_list', type=str, default=r'./data/splits/test_videofolder.txt')
 parser.add_argument('--csv_file', type=str, default=None)
 
 parser.add_argument('--softmax', default=False, action="store_true", help='use softmax')
@@ -131,6 +132,7 @@ for this_weights, this_test_segments, test_file in zip(weights_list, test_segmen
     modality_list.append(modality)
     num_class, args.train_list, val_list, root_path, prefix = dataset_config.return_dataset(args.dataset,
                                                                                             modality)
+    print(num_class)
     print('=> shift: {}, shift_div: {}, shift_place: {}'.format(is_shift, shift_div, shift_place))
     net = TSN(num_class, this_test_segments if is_shift else 1, modality,
               base_model=this_arch,
@@ -324,8 +326,8 @@ if args.csv_file is not None:
     #                 fill.append(p)
     #             f.write('{};{};{};{};{};{}\n'.format(*fill))
 
-# cf = confusion_matrix(video_labels, video_pred).astype(float)
-cf = confusion_matrix(video_labels, [0, 1]).astype(float)
+cf = confusion_matrix(video_labels, video_pred).astype(float)
+# cf = confusion_matrix(video_labels, [0, 1]).astype(float)
 
 np.save('cm.npy', cf)
 cls_cnt = cf.sum(axis=1)

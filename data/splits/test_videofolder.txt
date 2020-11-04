@@ -1,2 +1,11 @@
 no_HockFight/no1_xvi 41 0
 yes_HockFight/fi1_xvi 41 1
+no_HockFight/no2_xvi 41 0
+yes_HockFight/fi2_xvi 41 1
+no_HockFight/no3_xvi 41 0
+yes_HockFight/fi3_xvi 41 1
+no_HockFight/no4_xvi 41 0
+yes_HockFight/fi4_xvi 41 1
+no_HockFight/no5_xvi 41 0
+yes_HockFight/fi5_xvi 41 1
+no_HockFight/no6_xvi 41 0

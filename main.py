@@ -248,10 +248,10 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
 
         # measure accuracy and record loss
         # prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-        prec1, prec5 = accuracy(output.data, target, topk=(1, 2))
+        prec1, = accuracy(output.data, target, topk=(1,))
         losses.update(loss.item(), input.size(0))
         top1.update(prec1.item(), input.size(0))
-        top5.update(prec5.item(), input.size(0))
+        # top5.update(prec5.item(), input.size(0))
 
         # compute gradient and do SGD step
         loss.backward()
@@ -271,10 +271,12 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                      'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                      'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
+                      'Prec@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
+                # 'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
+                # 'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
                 epoch, i, len(train_loader), batch_time=batch_time,
-                data_time=data_time, loss=losses, top1=top1, top5=top5,
+                # data_time=data_time, loss=losses, top1=top1, top5=top5,
+                data_time=data_time, loss=losses, top1=top1,
                 lr=optimizer.param_groups[-1]['lr'] * 0.1))  # TODO
             print(output)
             log.write(output + '\n')
@@ -306,11 +308,11 @@ def validate(val_loader, model, criterion, epoch, log=None, tf_writer=None):
 
             # measure accuracy and record loss
             # prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-            prec1, prec5 = accuracy(output.data, target, topk=(1, 2))
+            prec1, = accuracy(output.data, target, topk=(1,))
 
             losses.update(loss.item(), input.size(0))
             top1.update(prec1.item(), input.size(0))
-            top5.update(prec5.item(), input.size(0))
+            # top5.update(prec5.item(), input.size(0))
 
             # measure elapsed time
             batch_time.update(time.time() - end)
@@ -320,10 +322,12 @@ def validate(val_loader, model, criterion, epoch, log=None, tf_writer=None):
                 output = ('Test: [{0}/{1}]\t'
                           'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                           'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                          'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                          'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
+                # 'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
+                # 'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
+                          'Prec@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
                     i, len(val_loader), batch_time=batch_time, loss=losses,
-                    top1=top1, top5=top5))
+                    # top1=top1, top5=top5))
+                    top1=top1))
                 print(output)
                 if log is not None:
                     log.write(output + '\n')
