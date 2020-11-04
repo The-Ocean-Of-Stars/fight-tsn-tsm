@@ -42,7 +42,7 @@ parser.add_argument('-j', '--workers', default=0, type=int, metavar='N',
 
 # for true test
 # parser.add_argument('--test_list', type=str, default=None)
-parser.add_argument('--test_list', type=str, default=r'D:\fight-tsn-tsm\data\splits\test_videofolder.txt')
+parser.add_argument('--test_list', type=str, default=r'.\data\splits\test_videofolder.txt')
 parser.add_argument('--csv_file', type=str, default=None)
 
 parser.add_argument('--softmax', default=False, action="store_true", help='use softmax')
@@ -298,7 +298,7 @@ for i, data_label_pairs in enumerate(zip(*data_iter_list)):
                                                 float(cnt_time) / (i + 1) / args.batch_size, top1.avg))
 
 video_pred = [np.argmax(x[0]) for x in output]
-print(output[0][0].shape)
+# print(output[0][0].shape)
 # video_pred_top5 = [np.argsort(np.mean(x[0], axis=0).reshape(-1))[::-1][:5] for x in output]
 
 video_labels = [x[1] for x in output]

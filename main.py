@@ -30,9 +30,6 @@ def main():
 
     num_class, args.train_list, args.val_list, args.root_path, prefix = dataset_config.return_dataset(args.dataset,
                                                                                                       args.modality)
-
-
-    # exit(0)
     full_arch_name = args.arch
     if args.shift:
         full_arch_name += '_shift{}_{}'.format(args.shift_div, args.shift_place)

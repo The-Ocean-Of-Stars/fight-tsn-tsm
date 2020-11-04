@@ -28,7 +28,8 @@ parser.add_argument('--loss_type', type=str, default="nll",
 parser.add_argument('--img_feature_dim', default=256, type=int, help="the feature dimension for each frame")
 parser.add_argument('--suffix', type=str, default=None)
 parser.add_argument('--pretrain', type=str, default='imagenet')
-parser.add_argument('--tune_from', type=str, default=None, help='fine-tune from checkpoint')
+# parser.add_argument('--tune_from', type=str, default=None, help='fine-tune from checkpoint')
+parser.add_argument('--tune_from', type=str, default="./pretrained/TSM_somethingv2_RGB_resnet50_shift8_blockres_avg_segment16_e45.pth", help='fine-tune from checkpoint')
 
 # ========================= Learning Configs ==========================
 # parser.add_argument('--epochs', default=120, type=int, metavar='N',
