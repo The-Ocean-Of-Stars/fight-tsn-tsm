@@ -1,0 +1,26 @@
+# 连接会话并查看分配的排至
+!nvidia-smi
+
+# 查看当前目录
+!pwd
+
+# 挂载google硬盘
+from google.colab import drive
+drive.mount('/content/gdrive')
+
+# 切换目录
+%cd /content/gdrive/My\ Drive/YOLO/fight-tsn-tsm
+
+# 解压：将图片压缩包解压到对应的目录下
+!unzip /content/gdrive/My\ Drive/YOLO/fight-tsn-tsm/data/no_HockFight_4_9_497_500.zip -d /content/gdrive/My\ Drive/YOLO/fight-tsn-tsm/data/frams/no_HockFight
+
+!unzip /content/gdrive/My\ Drive/YOLO/fight-tsn-tsm/data/yes_HockFight141_280.zip -d /content/gdrive/My\ Drive/YOLO/fight-tsn-tsm/data/frams/yes_HockFight
+
+# 安装依赖包tensorboardX
+!pip install tensorboardX
+
+# 查看rensorboardX的版本信息
+!pip show tensorboardX
+
+# 运行代码
+!python main.py
