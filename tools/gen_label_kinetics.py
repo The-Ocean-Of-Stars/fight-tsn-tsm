@@ -51,9 +51,6 @@ if __name__ == '__main__':
         for i in range(len(folders)):
             curFolder = folders[i]
             curIDX = idx_categories[i]
-            print(dataset_path)
-            print(categories_list)
-            print(curFolder)
             # counting the number of frames in each video folders
             # img_dir = os.path.join(dataset_path, categories_list[i], curFolder)
             img_dir = os.path.join(os.path.join(dataset_path, categories_list[i]) + "/", curFolder)
