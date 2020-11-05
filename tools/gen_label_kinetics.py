@@ -11,7 +11,7 @@ dataset_path = r'../data/frams/'
 label_path = r'../data/splits/'
 
 if __name__ == '__main__':
-    with open(os.path.join(label_path, 'HockeyFights_label_map.txt')) as f:
+    with open(os.path.join(label_path, 'category.txt')) as f:
         categories = f.readlines()
         # print(categories)
         # categories = [c.strip() for c in categories]
@@ -51,15 +51,20 @@ if __name__ == '__main__':
         for i in range(len(folders)):
             curFolder = folders[i]
             curIDX = idx_categories[i]
+            print(dataset_path)
+            print(categories_list)
+            print(curFolder)
             # counting the number of frames in each video folders
-            img_dir = os.path.join(dataset_path, categories_list[i], curFolder)
+            # img_dir = os.path.join(dataset_path, categories_list[i], curFolder)
+            img_dir = os.path.join(os.path.join(dataset_path, categories_list[i]) + "/", curFolder)
             print(img_dir)
             if not os.path.exists(img_dir):
                 missing_folders.append(img_dir)
                 print(missing_folders)
             else:
                 dir_files = os.listdir(img_dir)
-                output.append('%s %d %d' % (os.path.join(categories_list[i], curFolder), len(dir_files), curIDX))
+                output.append('%s %d %d' % (
+                os.path.join(categories_list[i], curFolder).replace("\\", "/"), len(dir_files), curIDX))
             print('%d/%d, missing %d' % (i, len(folders), len(missing_folders)))
         with open(os.path.join(label_path, filename_output), 'w') as f:
             f.write('\n'.join(output))
