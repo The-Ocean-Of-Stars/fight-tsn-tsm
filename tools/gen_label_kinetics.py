@@ -7,8 +7,10 @@
 
 import os
 
-dataset_path = r'../data/frams/'
-label_path = r'../data/splits/'
+# dataset_path = r'../data/frams/'
+# label_path = r'../data/splits/'
+dataset_path = r'./frames/'
+label_path = r'./splits/'
 
 if __name__ == '__main__':
     with open(os.path.join(label_path, 'category.txt')) as f:
@@ -24,8 +26,10 @@ if __name__ == '__main__':
 
     print(dict_categories)
 
-    files_input = ['val.csv', 'train.csv']
-    files_output = ['val_videofolder.txt', 'train_videofolder.txt']
+    # files_input = ['val.csv', 'train.csv']
+    # files_output = ['val_videofolder.txt', 'train_videofolder.txt']
+    files_input = ['val.csv', 'train.csv', 'test.csv']
+    files_output = ['val_videofolder.txt', 'train_videofolder.txt', 'test_videofolder.txt']
     for (filename_input, filename_output) in zip(files_input, files_output):
         count_cat = {k: 0 for k in dict_categories.keys()}
         with open(os.path.join(label_path, filename_input)) as f:

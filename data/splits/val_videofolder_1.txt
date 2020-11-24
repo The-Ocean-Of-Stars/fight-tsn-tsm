@@ -1,4 +1,0 @@
-yes_HockFight/fi401_xvi 41 1
-yes_HockFight/fi402_xvi 41 1
-no_HockFight/no499_xvi 41 0
-no_HockFight/no500_xvi 41 0

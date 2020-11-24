@@ -5,8 +5,8 @@
 
 from torch import nn
 
-from ops.basic_ops import ConsensusModule
-from ops.transforms import *
+from basic_ops import ConsensusModule
+from transforms import *
 from torch.nn.init import normal_, constant_
 
 
@@ -107,13 +107,13 @@ class TSN(nn.Module):
             self.base_model = getattr(torchvision.models, base_model)(True if self.pretrain == 'imagenet' else False)
             if self.is_shift:
                 print('Adding temporal shift...')
-                from ops.temporal_shift import make_temporal_shift
+                from temporal_shift import make_temporal_shift
                 make_temporal_shift(self.base_model, self.num_segments,
                                     n_div=self.shift_div, place=self.shift_place, temporal_pool=self.temporal_pool)
 
             if self.non_local:
                 print('Adding non-local module...')
-                from ops.non_local import make_non_local
+                from non_local import make_non_local
                 make_non_local(self.base_model, self.num_segments)
 
             self.base_model.last_layer_name = 'fc'
@@ -131,7 +131,7 @@ class TSN(nn.Module):
                 self.input_std = self.input_std + [np.mean(self.input_std) * 2] * 3 * self.new_length
 
         elif base_model == 'mobilenetv2':
-            from archs.mobilenet_v2 import mobilenet_v2, InvertedResidual
+            from mobilenet_v2 import mobilenet_v2, InvertedResidual
             self.base_model = mobilenet_v2(True if self.pretrain == 'imagenet' else False)
 
             self.base_model.last_layer_name = 'classifier'
@@ -141,7 +141,7 @@ class TSN(nn.Module):
 
             self.base_model.avgpool = nn.AdaptiveAvgPool2d(1)
             if self.is_shift:
-                from ops.temporal_shift import TemporalShift
+                from temporal_shift import TemporalShift
                 for m in self.base_model.modules():
                     if isinstance(m, InvertedResidual) and len(m.conv) == 8 and m.use_res_connect:
                         if self.print_spec:
@@ -155,7 +155,7 @@ class TSN(nn.Module):
                 self.input_std = self.input_std + [np.mean(self.input_std) * 2] * 3 * self.new_length
 
         elif base_model == 'BNInception':
-            from archs.bn_inception import bninception
+            from bn_inception import bninception
             self.base_model = bninception(pretrained=self.pretrain)
             self.input_size = self.base_model.input_size
             self.input_mean = self.base_model.mean
@@ -271,6 +271,8 @@ class TSN(nn.Module):
                 sample_len = 3 * self.new_length
                 input = self._get_diff(input)
 
+            # print(input.shape)
+            # print(input.view((-1, sample_len) + input.size()[-2:]).shape)
             base_out = self.base_model(input.view((-1, sample_len) + input.size()[-2:]))
         else:
             base_out = self.base_model(input)
@@ -286,7 +288,11 @@ class TSN(nn.Module):
                 base_out = base_out.view((-1, self.num_segments // 2) + base_out.size()[1:])
             else:
                 base_out = base_out.view((-1, self.num_segments) + base_out.size()[1:])
+
+            # print(base_out.shape)
+
             output = self.consensus(base_out)
+            # print(output.shape, output.squeeze(1).shape)
             return output.squeeze(1)
 
     def _get_diff(self, input, keep_rgb=False):

@@ -26,7 +26,7 @@ parser.add_argument('--dataset', type=str, default="HockeyFights")
 # parser.add_argument('--weights', type=str, default=None)
 parser.add_argument('--weights', type=str,
                     # default="./pretrained/TSM_somethingv2_RGB_resnet50_shift8_blockres_avg_segment16_e45.pth")
-                    default="./checkpoint/TSM_HockeyFights_RGB_resnet50_avg_segment8_e50/ckpt.best.pth.tar")
+                    default="./checkpoint/TSM_HockeyFights_RGB_resnet50_shift8_blockres_avg_segment8_e50/ckpt.best.pth.tar")
 # parser.add_argument('--test_segments', type=str, default='25')
 parser.add_argument('--test_segments', type=str, default='8')
 parser.add_argument('--dense_sample', default=False, action="store_true", help='use dense sample as I3D')
@@ -132,7 +132,7 @@ for this_weights, this_test_segments, test_file in zip(weights_list, test_segmen
     modality_list.append(modality)
     num_class, args.train_list, val_list, root_path, prefix = dataset_config.return_dataset(args.dataset,
                                                                                             modality)
-    print(num_class)
+    # print(num_class)  # 2
     print('=> shift: {}, shift_div: {}, shift_place: {}'.format(is_shift, shift_div, shift_place))
     net = TSN(num_class, this_test_segments if is_shift else 1, modality,
               base_model=this_arch,
@@ -245,7 +245,9 @@ def eval_video(video_data, net, this_test_segments, modality):
         data_in = data.view(-1, length, data.size(2), data.size(3))
         if is_shift:
             data_in = data_in.view(batch_size * num_crop, this_test_segments, length, data_in.size(2), data_in.size(3))
+        # print(data_in.shape)  # [1, 8, 3, 224, 224]
         rst = net(data_in)
+        # print(rst.shape)  # [1, 2]
         rst = rst.reshape(batch_size, num_crop, -1).mean(1)
 
         if args.softmax:
@@ -305,26 +307,26 @@ video_pred = [np.argmax(x[0]) for x in output]
 
 video_labels = [x[1] for x in output]
 
-if args.csv_file is not None:
-    print('=> Writing result to csv file: {}'.format(args.csv_file))
-    with open(test_file_list[0].replace('test_videofolder.txt', 'category.txt')) as f:
-        categories = f.readlines()
-    categories = [f.strip() for f in categories]
-    with open(test_file_list[0]) as f:
-        vid_names = f.readlines()
-    vid_names = [n.split(' ')[0] for n in vid_names]
-    assert len(vid_names) == len(video_pred)
-    if args.dataset != 'somethingv2':  # only output top1
-        with open(args.csv_file, 'w') as f:
-            for n, pred in zip(vid_names, video_pred):
-                f.write('{};{}\n'.format(n, categories[pred]))
-    # else:
-    #     with open(args.csv_file, 'w') as f:
-    #         for n, pred5 in zip(vid_names, video_pred_top5):
-    #             fill = [n]
-    #             for p in list(pred5):
-    #                 fill.append(p)
-    #             f.write('{};{};{};{};{};{}\n'.format(*fill))
+# if args.csv_file is not None:
+#     print('=> Writing result to csv file: {}'.format(args.csv_file))
+#     with open(test_file_list[0].replace('test_videofolder.txt', 'category.txt')) as f:
+#         categories = f.readlines()
+#     categories = [f.strip() for f in categories]
+#     with open(test_file_list[0]) as f:
+#         vid_names = f.readlines()
+#     vid_names = [n.split(' ')[0] for n in vid_names]
+#     assert len(vid_names) == len(video_pred)
+#     if args.dataset != 'somethingv2':  # only output top1
+#         with open(args.csv_file, 'w') as f:
+#             for n, pred in zip(vid_names, video_pred):
+#                 f.write('{};{}\n'.format(n, categories[pred]))
+#     # else:
+#     #     with open(args.csv_file, 'w') as f:
+#     #         for n, pred5 in zip(vid_names, video_pred_top5):
+#     #             fill = [n]
+#     #             for p in list(pred5):
+#     #                 fill.append(p)
+#     #             f.write('{};{};{};{};{};{}\n'.format(*fill))
 
 cf = confusion_matrix(video_labels, video_pred).astype(float)
 # cf = confusion_matrix(video_labels, [0, 1]).astype(float)

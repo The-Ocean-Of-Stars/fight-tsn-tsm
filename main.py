@@ -73,7 +73,6 @@ def main():
         flip=False if 'something' in args.dataset or 'jester' in args.dataset else True)
 
     model = torch.nn.DataParallel(model, device_ids=args.gpus).cuda()
-    # model = model.cuda()
 
     optimizer = torch.optim.SGD(policies,
                                 args.lr,
@@ -223,7 +222,7 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
     data_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
-    top5 = AverageMeter()
+    # top5 = AverageMeter()
 
     if args.no_partialbn:
         model.module.partialBN(False)
@@ -244,6 +243,7 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
 
         # compute output
         output = model(input_var)
+
         loss = criterion(output, target_var)
 
         # measure accuracy and record loss
@@ -284,7 +284,7 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
 
     tf_writer.add_scalar('loss/train', losses.avg, epoch)
     tf_writer.add_scalar('acc/train_top1', top1.avg, epoch)
-    tf_writer.add_scalar('acc/train_top5', top5.avg, epoch)
+    # tf_writer.add_scalar('acc/train_top5', top5.avg, epoch)
     tf_writer.add_scalar('lr', optimizer.param_groups[-1]['lr'], epoch)
 
 
@@ -292,7 +292,7 @@ def validate(val_loader, model, criterion, epoch, log=None, tf_writer=None):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
-    top5 = AverageMeter()
+    # top5 = AverageMeter()
 
     # switch to evaluate mode
     model.eval()
@@ -333,8 +333,10 @@ def validate(val_loader, model, criterion, epoch, log=None, tf_writer=None):
                     log.write(output + '\n')
                     log.flush()
 
-    output = ('Testing Results: Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f} Loss {loss.avg:.5f}'
-              .format(top1=top1, top5=top5, loss=losses))
+    # output = ('Testing Results: Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f} Loss {loss.avg:.5f}'
+    #           .format(top1=top1, top5=top5, loss=losses))
+    output = ('Testing Results: Prec@1 {top1.avg:.3f} Loss {loss.avg:.5f}'
+              .format(top1=top1, loss=losses))
     print(output)
     if log is not None:
         log.write(output + '\n')
@@ -343,7 +345,7 @@ def validate(val_loader, model, criterion, epoch, log=None, tf_writer=None):
     if tf_writer is not None:
         tf_writer.add_scalar('loss/test', losses.avg, epoch)
         tf_writer.add_scalar('acc/test_top1', top1.avg, epoch)
-        tf_writer.add_scalar('acc/test_top5', top5.avg, epoch)
+        # tf_writer.add_scalar('acc/test_top5', top5.avg, epoch)
 
     return top1.avg
 
